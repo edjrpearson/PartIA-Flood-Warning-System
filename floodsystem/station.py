@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 """This module provides a model for a monitoring station, and tools
 for manipulating/modifying station data
-
 """
 
 
@@ -38,3 +37,17 @@ class MonitoringStation:
         d += "   river:         {}\n".format(self.river)
         d += "   typical range: {}".format(self.typical_range)
         return d
+
+    def typical_range_consistent(self):
+        """Checks the typical high/low range data for consistency. Returns a boolean."""
+        return not(not self.typical_range or self.typical_range[1] < self.typical_range[0])
+
+    def relative_water_level(self):
+        """Returns the current water level as a fraction of the typical range."""
+        if self.typical_range_consistent() and self.latest_level:
+            return (self.latest_level - self.typical_range[0]) / (self.typical_range[1] - self.typical_range[0])
+        return None
+    
+def inconsistent_typical_range_stations(stations):
+    """Given a list of stations return a list of stations with inconsistent typical ranges."""
+    return [station for station in stations if not station.typical_range_consistent()]
